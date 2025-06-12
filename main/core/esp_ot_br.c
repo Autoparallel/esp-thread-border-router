@@ -29,11 +29,9 @@
 #include "esp_openthread_types.h"
 #include "esp_ot_cli_extension.h"
 #include "esp_ot_config.h"
-#include "esp_ot_wifi_cmd.h"
 #include "esp_vfs_dev.h"
 #include "esp_vfs_eventfd.h"
 #include "esp_spiffs.h"
-#include "esp_wifi.h"
 #include "mdns.h"
 #include "nvs_flash.h"
 #include "protocol_examples_common.h"
@@ -41,27 +39,14 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "hal/uart_types.h"
+#include "openthread/commissioner.h"
 #include "openthread/error.h"
 #include "openthread/logging.h"
 #include "openthread/tasklet.h"
-#include "openthread/commissioner.h"
 #include "openthread/thread.h"
 #include "esp_br_web.h"
 
-#if CONFIG_OPENTHREAD_STATE_INDICATOR_ENABLE
-#include "ot_led_strip.h"
-#endif
-
-#define TAG "esp_ot_br"
-
-#if CONFIG_EXTERNAL_COEX_ENABLE
-static void ot_br_external_coexist_init(void)
-{
-    esp_external_coex_gpio_set_t gpio_pin = ESP_OPENTHREAD_DEFAULT_EXTERNAL_COEX_CONFIG();
-    esp_external_coex_set_work_mode(EXTERNAL_COEX_LEADER_ROLE);
-    ESP_ERROR_CHECK(esp_enable_extern_coex_gpio_pin(CONFIG_EXTERNAL_COEX_WIRE_TYPE, gpio_pin));
-}
-#endif /* CONFIG_EXTERNAL_COEX_ENABLE */
+static const char *TAG = "ot_br";
 
 static void ot_task_worker(void *aContext)
 {
@@ -131,11 +116,10 @@ static void commissioner_monitor_task(void *pvParameters)
 void ot_br_init(void *ctx)
 {
     // Mount SPIFFS filesystem for web storage first
-    esp_vfs_spiffs_conf_t web_server_conf = {
-        .base_path = "/spiffs",
-        .partition_label = "web_storage",
-        .max_files = 10,
-        .format_if_mount_failed = false};
+    esp_vfs_spiffs_conf_t web_server_conf = {.base_path = "/spiffs",
+                                             .partition_label = "web_storage",
+                                             .max_files = 10,
+                                             .format_if_mount_failed = false};
     ESP_LOGI(TAG, "Mounting SPIFFS filesystem...");
     esp_err_t spiffs_ret = esp_vfs_spiffs_register(&web_server_conf);
     if (spiffs_ret == ESP_OK)
@@ -152,30 +136,9 @@ void ot_br_init(void *ctx)
     esp_br_web_start("/spiffs");
     ESP_LOGI(TAG, "Web server event handlers registered");
 
-#if CONFIG_EXAMPLE_CONNECT_WIFI
-#if CONFIG_OPENTHREAD_BR_AUTO_START
-    ESP_ERROR_CHECK(example_connect());
-    ESP_ERROR_CHECK(esp_wifi_set_ps(WIFI_PS_MAX_MODEM));
-#if CONFIG_ESP_COEX_SW_COEXIST_ENABLE && CONFIG_OPENTHREAD_RADIO_NATIVE
-    ESP_ERROR_CHECK(esp_coex_wifi_i154_enable());
-#else
-
-#if CONFIG_EXTERNAL_COEX_ENABLE
-    ot_br_external_coexist_init();
-#endif // CONFIG_EXTERNAL_COEX_ENABLE
-
-#endif
-    esp_openthread_set_backbone_netif(get_example_netif());
-#else
-    esp_ot_wifi_netif_init();
-    esp_openthread_set_backbone_netif(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF"));
-#endif // CONFIG_OPENTHREAD_BR_AUTO_START
-#elif CONFIG_EXAMPLE_CONNECT_ETHERNET
+    // Connect to the backbone network (Ethernet)
     ESP_ERROR_CHECK(example_connect());
     esp_openthread_set_backbone_netif(get_example_netif());
-#else
-    ESP_LOGE(TAG, "ESP-Openthread has not set backbone netif");
-#endif // CONFIG_EXAMPLE_CONNECT_WIFI
 
     ESP_ERROR_CHECK(mdns_init());
     ESP_ERROR_CHECK(mdns_hostname_set("esp-ot-br"));
@@ -206,15 +169,9 @@ void app_main(void)
     // * netif
     // * task queue
     // * border router
+    // * radio driver (A native radio device needs a eventfd for radio driver.)
     esp_vfs_eventfd_config_t eventfd_config = {
-#if CONFIG_OPENTHREAD_RADIO_NATIVE || CONFIG_OPENTHREAD_RADIO_SPINEL_SPI
-        // * radio driver (A native radio device needs a eventfd for radio driver.)
-        // * SpiSpinelInterface (The Spi Spinel Interface needs a eventfd.)
-        // The above will not exist at the same time.
         .max_fds = 4,
-#else
-        .max_fds = 3,
-#endif
     };
     ESP_ERROR_CHECK(esp_vfs_eventfd_register(&eventfd_config));
     ESP_ERROR_CHECK(nvs_flash_init());

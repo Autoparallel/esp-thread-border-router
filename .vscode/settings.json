@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "string.h": "c",
+        "esp_openthread_lock.h": "c"
+    }
+}
