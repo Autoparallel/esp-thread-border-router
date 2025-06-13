@@ -1,6 +1,4 @@
 {
-    "files.associations": {
-        "string.h": "c",
-        "esp_openthread_lock.h": "c"
-    }
+    "idf.port": "/dev/cu.usbmodem11401",
+    "idf.flashType": "UART",
 }

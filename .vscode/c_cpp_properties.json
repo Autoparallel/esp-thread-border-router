@@ -5,11 +5,12 @@
             "compilerPath": "/Users/autoparallel/.espressif/tools/riscv32-esp-elf/esp-14.2.0_20241119/riscv32-esp-elf/bin/riscv32-esp-elf-gcc",
             "includePath": [
                 "${config:idf.espIdfPath}/components/**",
+                "${config:idf.espIdfPath}/examples/common_components/protocol_examples_common/include",
+                "${workspaceFolder}/build/config",
                 "${workspaceFolder}/**",
-                "/Users/autoparallel/Code/esp-thread-border-router/managed_components/espressif__esp_ot_cli_extension/include",
-                "/Users/autoparallel/Code/esp-thread-border-router/managed_components/espressif__iperf/include",
-                "/Users/autoparallel/Code/esp-thread-border-router/managed_components/espressif__mdns/include",
-                "/Users/autoparallel/esp/v5.4.1/esp-idf/examples/common_components/protocol_examples_common/include"
+                "${workspaceFolder}/managed_components/espressif__esp_ot_cli_extension/include",
+                "${workspaceFolder}/managed_components/espressif__iperf/include",
+                "${workspaceFolder}/managed_components/espressif__mdns/include"
             ],
             "browse": {
                 "path": [

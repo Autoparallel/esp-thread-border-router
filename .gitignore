@@ -1,7 +1,3 @@
 build/
 managed_components/
-sdkconfig.old
-# Misc
-.DS_Store
-*.orig
 .env
