@@ -1,652 +1,1144 @@
 <!DOCTYPE html>
-<html lang="en-US">
+<html lang="en">
 
 <head>
   <meta charset="utf-8">
-  <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>ESP32-OpenThread-AIOT</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESP32 Thread Border Router Dashboard</title>
   <link href="/static/style.css" type="text/css" rel="stylesheet">
-  <script src="/static/restful.js" defer="true"></script>
   <link href="/favicon.ico" rel="icon">
-  
-  <!-- <link href="/static/bootstrap.min.css" rel="stylesheet"> -->
-  <!--  <script src="/static/jquery.min.js"></script> -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
-  <script src="https://d3js.org/d3.v3.min.js"></script>
-  <style>
-    .container {
-      width: 1500px;
-    }
-  </style>
+
+  <!-- Modern CSS Framework for better browser compatibility -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- Chart.js for better data visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+
+
 </head>
 
 <body>
-  <header id="header" class="header fixed-top sticked" data-scrollto-offset="0">
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-md-4">
-          <a href="https://www.espressif.com/en" class="logo">
-            <h1>ESPRESSIF-<span style="color: #0ea2bd">OpenThread.</span></h1>
-          </a>
-        </div>
-        <div class="col-md-6 menu">
-          <nav id="navbar" class="navbar">
-            <ul>
-              <li class="nav-link"><a href="index.html#Main-Section"><span>Home</span></a>
-              </li>
-              <li><a class="nav-link" href="index.html#Scan">Scan</a></li>
-              <li><a class="nav-link" href="index.html#Form">Form</a></li>
-              <li><a class="nav-link" href="index.html#Settings">Settings</a></li>
-              <li><a class="nav-link" href="index.html#Status">Status</a></li>
-              <li><a class="nav-link" href="index.html#Topology">Topology</a></li>
-              <li><a class="nav-link" href="index.html#Contact">Contact</a></li>
-            </ul>
-          </nav>
-        </div>
-        <div class="col-md-2"></div>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="#">
+        <i class="fas fa-network-wired me-2"></i>
+        ESP32 Thread Border Router
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="#overview">Overview</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#topology">Topology</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#devices">Devices</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#diagnostics">Diagnostics</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#network">Network</a>
+          </li>
+        </ul>
       </div>
     </div>
-  </header>
-  <section class="main-section" id="Main-Section">
-    <div class="container text-center position-relative default-margin">
-      <h2>Espressif Thread Border Router <span>WEB-GUI</span></h2>
-      <div class="text-left" style="margin-top: 50px;">
-        <p>
-          &nbsp &nbsp &nbsp &nbsp Espressif Systems (688018.SH) is a public multinational, fabless semiconductor company
-          established in 2008,
-          with offices in China, the Czech Republic, India, Singapore and Brazil.
-          We have a passionate team of engineers and scientists from all over the world, focused on developing
-          cutting-edge wireless communication, low-power, AIoT solutions.
-          We have created the popular ESP8266, ESP32, ESP32-S, ESP32-C and ESP32-H series of chips, modules and
-          development boards.
-          By leveraging wireless computing, we provide green, versatile and cost-effective chipsets.
-          We are committed to offering solutions that are secure, robust and power-efficient.
-          At the same time, by open-sourcing our technology and solutions, we aim to enable developers to use
-          Espressif's solutions globally and build their own smart-connected devices.
-        </p>
-      </div>
-    </div>
-  </section>
-  <main id="main">
-    <section id="notice-section" class="notice-section">
-      <div class="container">
-        <div class="row">
-          <div class="col-md-5">
-            <div class="service-item">
-              <h4 class="text-center"><a href="https://github.com/espressif/esp-idf">Espressif IoT Development
-                  Framework.</a></h4>
-              <p> &nbsp &nbsp &nbsp &nbsp ESP-IDF is the development framework for Espressif SoCs supported on Windows,
-                Linux and macOS.
-                Espressif provides basic hardware and software resources to help application developers realize their
-                ideas using the ESP32 series hardware.
-              </p>
-            </div>
-          </div>
-          <div class="col-md-5 col-md-offset-2">
-            <div class="service-item">
-              <h4 class="text-center"><a href="https://github.com/espressif/esp-thread-br">ESP Thread Border Router
-                  SDK.</a></h4>
-              <p> &nbsp &nbsp &nbsp &nbsp ESP-Thread-BR is the official ESP Thread Border Router SDK.
-                It supports all fundamental network features to build a Thread Border Router and integrates rich product
-                level features for quick productization.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-    <section id="Scan" class="sub-section">
-      <div class="container">
-        <div class="section-header default-margin">
-          <h2><span style="color: #0ea2bd">Discover</span> Thread Network</h2>
-          <p>Here, you can scan for available Thread networks, and choose to join one of them.</p>
-        </div>
-        <div class="row">
-          <table id="available_networks_table" class="pure-table pure-table-horizontal">
-            <caption>Available Thread Networks</caption>
-            <thead>
-              <tr>
-                <th style="width: 100px;">No.</th>
-                <th>Network Name</th>
-                <th>Extended PAN ID</th>
-                <th>PAN ID</th>
-                <th>Mac Address</th>
-                <th style="width: 120px;">Channel</th>
-                <th style="width: 120px;">dBm</th>
-                <th style="width: 120px;">LQI</th>
-                <th style="width: 150px;">Action</th>
-              </tr>
-            </thead>
-            <tbody id="available_networks_body">
-              <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><button class="btn-submit" onclick="frontend_show_join_network_window(this)">Join</button></td>
-              </tr>
-            </tbody>
-          </table>
-          <div id="join_window" class="dialog">
-            <div class="dialog-content">
-              <h2>Join Information</h2>
-                <form id = "join_network_table" onsubmit="return false">
-                  <div>
-                    <label for="credentialType">Credential Type:</label>
-                    <select id="credentialType" name="credentialType" onclick="frontend_join_type_select(this)">
-                      <option value="networkKeyType">Network Key</option>
-                      <option value="pskdType">Thread PSKD</option>
-                    </select>
-                  </div>
-                  <div id="join_networkKey" style="margin-top: 40px;">
-                    <label for="networkKey">Network Key:</label>
-					          <input type="text" name="networkKey" value="00112233445566778899aabbccddeeff">
-                  </div>
-                  <div id="join_pskd" style="margin-top: 40px; display: none;">
-                      <label for="pskd">Pskd:</label>
-					            <input type="text"  name="pskd" placeholder="Pskd">
-                  </div>
-                  <div id = "join_prefix">
-                      <label for="prefix">Prefix:</label>
-                      <input type="text" name="prefix" value="fd11:22::">
-                  </div>
+  </nav>
 
-                  <div id = "join_defaultRoute">
-                    <label for="defaultRoute">Default Route: </label>
-                    <input type="checkbox" name="defaultRoute" checked>
-                  </div>
-                                  
-                  <button type = "submit" class="dialog-button" onclick="frontend_submit_join_network(this)">Submit</button>
-                  <button type = "submit" class="dialog-button" onclick="frontend_cancel_join_network(this)">Cancel</button>
-                  <br/>
-                  <br/>
-                </form>
-            </div>
-          </div>
-        </div>
-          <div class="row">
-            <button class="btn-submit" style="margin-top: 1%; margin-left: 1275px;"
-              onclick="http_server_scan_thread_network()">SCAN</button>
-          </div>         
+  <!-- Main Content -->
+  <div class="container mt-4">
+    <!-- Global Refresh Button -->
+    <div class="row mb-3">
+      <div class="col-12">
+        <div class="d-flex justify-content-end">
+          <button class="btn btn-success refresh-button" onclick="refreshAllData()">
+            <i class="fas fa-sync-alt me-1" id="global-refresh-icon"></i>Refresh All Data
+          </button>
         </div>
       </div>
-    </section>
-    <section id="Form" class="sub-section">
-      <div class="container">
-        <div class="section-header default-margin">
-          <h2><span style="color: #0ea2bd">Form</span> Thread Network</h2>
-          <p>Here, the ESP-OpenThread network would be form using the parameter provided by you.</p>
+    </div>
+
+    <!-- Overview Section -->
+    <section id="overview">
+      <div class="row mb-4">
+        <div class="col-12">
+          <h2 class="section-title">
+            <i class="fas fa-tachometer-alt me-2"></i>Network Overview
+            <button class="btn btn-primary btn-sm float-end refresh-button" onclick="refreshNetworkOverview()">
+              <i class="fas fa-sync-alt me-1" id="overview-refresh-icon"></i>Refresh Overview
+            </button>
+          </h2>
         </div>
-        <div class="part">
-          <div class="submit-form">
-            <div class="row">
-              <div class="col-md-8">
-                <h4>Inputing the parameter of ESP-OpenThread in Form.</h4>
-              </div>
-              <div class="col-md-4">
-                <h4 id="form_tip"
-                  style="color: green; font-weight: 200; font-family: 'Times New Roman', Times, serif; display: none;">
-                  upload...</h4>
-              </div>
+      </div>
+
+      <!-- Network Information Cards -->
+      <div class="row mb-4">
+        <div class="col-lg-6">
+          <div class="card h-90">
+            <div class="card-header">
+              <i class="fas fa-info-circle me-2"></i>Network Information
             </div>
-            <p>note: the table which marks * must be filled.</p>
-            <hr/>
-            <form action="" enctype='application/json' method="post" id="network_form">
-              <div class="row">
-                <div class="col-md-6 form-group">
-                  <span>
-                    <p style="font-size: 16px; font-weight:700;">Network Name <span style="color: red;">*</span></p>
-                  </span>
-                  <input name="networkName" type="text" class="form-control" value="OpenThread-0x99">
-                </div>
-                <div class="col-md-6 form-group">
-                  <span>
-                    <p style="font-size: 16px; font-weight:700;">Network Key <span style="color: red;">*</span></p>
-                  </span>
-                  <input name="networkKey" type="text" class="form-control" value="00112233445566778899aabbccddeeff">
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-6 form-group">
-                  <span>
-                    <p style="font-size: 16px; font-weight:700;">PANID <span style="color: red;">*</span></p>
-                  </span>
-                  <input name="panId" type="text" class="form-control" value="0x1234">
-                </div>
-                <div class="col-md-6 form-group">
-                  <span>
-                    <p style="font-size: 16px; font-weight:700;">Network Channel <span style="color: red;">*</span></p>
-                  </span>
-                  <input name="channel" type="number" class="form-control" value="15">
+            <div class="card-body">
+              <div class="info-row">
+                <div class="d-flex justify-content-between">
+                  <span class="info-label">Network Name:</span>
+                  <span class="info-value" id="network-name">Loading...</span>
                 </div>
               </div>
 
-              <div id="form-more-param" style="display:none">
-                <div class="row">
-                  <div class="col-md-6 form-group">
-                    <span>
-                      <p style="font-size: 16px; font-weight:700;">Network Extended PANID </p>
-                    </span>
-                    <input name="extPanId" type="text" class="form-control" value="1111111122222222">
-                  </div>
-                  <div class="col-md-6 form-group">
-                    <span>
-                      <p style="font-size: 16px; font-weight:700;">Passphrase/Commissioner Credential</p>
-                    </span>
-                    <input name="passphrase" type="text" class="form-control" value="j01Nme">
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-md-12 form-group">
-                    <p style="font-size: 16px; font-weight:700;">On-Mesh Prefix</p>
-                    <input name="prefix" type="text" class="form-control" value="fd11:22::">
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-md-3 form-checkbox">
-                    <input type="checkbox" checked="check" name="defaultRoute" />
-                    <span style="font-size: 16px;">Default Route</span>
-                  </div>
+              <div class="info-row">
+                <div class="d-flex justify-content-between">
+                  <span class="info-label">PAN ID:</span>
+                  <span class="info-value" id="network-panid">Loading...</span>
                 </div>
               </div>
-              <div class="row" style="float: right;">
-                <a id="form-more-tip" style="font-size:16px" onclick="frontend_click_for_more_form_param()">for more &#x21B5;</a>
+              <div class="info-row">
+                <div class="d-flex justify-content-between">
+                  <span class="info-label">Extended PAN ID:</span>
+                  <span class="info-value mac-address" id="network-extpanid">Loading...</span>
+                </div>
               </div>
-              <div class="row">
+              <div class="info-row">
+                <div class="d-flex justify-content-between">
+                  <span class="info-label">Channel:</span>
+                  <span class="info-value" id="network-channel">Loading...</span>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="d-flex justify-content-between">
+                  <span class="info-label">Channel Mask:</span>
+                  <span class="info-value" id="network-channel-mask">Loading...</span>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="d-flex justify-content-between">
+                  <span class="info-label">Network Key:</span>
+                  <span class="info-value mac-address" id="network-key">Loading...</span>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="d-flex justify-content-between">
+                  <span class="info-label">PSKc:</span>
+                  <span class="info-value mac-address" id="network-pskc">Loading...</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="card h-90">
+            <div class="card-header">
+              <i class="fas fa-router me-2"></i>Device Information
+            </div>
+            <div class="card-body">
+              <div class="info-row">
+                <div class="d-flex justify-content-between">
+                  <span class="info-label">Role:</span>
+                  <span>
+                    <span class="status-indicator status-offline" id="status-indicator"></span>
+                    <span class="info-value" id="network-status">Loading...</span>
+                  </span>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="d-flex justify-content-between">
+                  <span class="info-label">RLOC16:</span>
+                  <span class="info-value" id="device-rloc16">Loading...</span>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="d-flex justify-content-between">
+                  <span class="info-label">Extended Address:</span>
+                  <span class="info-value mac-address" id="device-ext-address">Loading...</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Network Statistics -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <i class="fas fa-chart-bar me-2"></i>Network Statistics
+            </div>
+            <div class="card-body">
+              <div class="row text-center">
                 <div class="col-md-2">
-                    <button type="button" class="btn btn-primary" onclick="http_server_upload_form_network_table()">Form Network</button>
+                  <div class="metric-value text-primary" id="router-count">0</div>
+                  <div class="metric-label text-muted">Routers</div>
                 </div>
-              </div>
-            </form>
-          </div><!-- End blog comments -->
-        </div>
-      </div>
-    </section>
-    <section id="Settings" class="sub-section">
-      <div class="container">
-        <div class="section-header default-margin">
-          <h2>Thread Network <span style="color: #0ea2bd">Settings</span></h2>
-          <p>Here, setting the default options for the ESP-OpenThread network can make your Thread device more flexible.</p>
-        </div>
-        <div class="part">
-          <div class="submit-form">
-            <div class="row">
-              <div class="col-md-8">
-                <h4>ESP-OpenThread Settings.</h4>
-              </div>
-              <div class="col-md-4">
-                <h4 id="setting_tip"
-                  style="color: green; font-weight: 200; font-family: 'Times New Roman', Times, serif; display: none;">
-                  completed...</h4>
-              </div>
-            </div>
-            <hr/>
-            <form action="" enctype='application/json' method="post" id="network_setting">
-              <div class="row">
-                <div class="col-md-12 form-group">
-                  <p style="font-size: 16px; font-weight:700;">On-Mesh Prefix</p>
-                  <input name="prefix" type="text" class="form-control" value="fd11:22::">
+                <div class="col-md-2">
+                  <div class="metric-value text-success" id="child-count">0</div>
+                  <div class="metric-label text-muted">Children</div>
                 </div>
-              </div>
-              <div class="row">
-                <div class="col-md-3 form-checkbox">
-                  <input type="checkbox" checked="check" name="defaultRoute" />
-                  <span style="font-size: 16px;">Default Route</span>
+                <div class="col-md-2">
+                  <div class="metric-value text-info" id="total-devices">0</div>
+                  <div class="metric-label text-muted">Total</div>
                 </div>
-              </div>
-              <div class="row">
-                <div class="col-md-1">
-                    <button type="button" class="btn btn-primary" onclick="http_server_add_prefix_to_thread_network()">Add</button>
+                <div class="col-md-2">
+                  <div class="metric-value text-primary" id="total-packets-in">0</div>
+                  <div class="metric-label text-muted">Packets In</div>
                 </div>
-                <div class="col-md-1">
-                    <button type="button" class="btn btn-primary" onclick="http_server_delete_prefix_from_thread_network()">Delete</button>
+                <div class="col-md-2">
+                  <div class="metric-value text-primary" id="total-packets-out">0</div>
+                  <div class="metric-label text-muted">Packets Out</div>
                 </div>
-              </div>
-            </form>
-          </div><!-- End blog comments -->
-        </div>
-      </div>
-    </section>
-    <section id="Status" class="sub-section">
-      <div class="container">
-        <div class="section-header default-margin">
-          <h2>Thread Network <span style="color: #0ea2bd" onclick="http_server_get_thread_network_properties()">Status</span> </h2>
-          <p>The status of the ESP-OpenThread network, including its IPv6, network, OpenThread, RCP, WPAN, and other components, would be displayed here.</p>
-        </div>
-        <div class="row g-4 g-lg-5">
-          <ul class="nav nav-pills mb-3">
-            <li><a class="nav-link active" data-bs-toggle="pill" id="link_0"
-                onclick="http_server_get_thread_network_properties()">OverView</a></li>
-            <li><a class="nav-link" data-bs-toggle="pill" id="link_1">IPv6</a></li>
-            <li><a class="nav-link" data-bs-toggle="pill" id="link_2">Network</a></li>
-            <li><a class="nav-link" data-bs-toggle="pill" id="link_3">OpenThread</a></li>
-            <li><a class="nav-link" data-bs-toggle="pill" id="link_4">RCP</a></li>
-            <li><a class="nav-link" data-bs-toggle="pill" id="link_5">WPAN</a></li>
-          </ul>
-          <div class="tab-content" id="status-content">
-            <div class="tab-pane active" id="tab0">
-              <div class="row">
-                <div class="col-lg-3">
-                  <h4 class="tab-pane-elem" style="font-weight: bold; font-style:normal; color: black"> [ IP Address ]</h4>
-                  <div class="d-flex align-items-center mt-4">
-                    <h4>Link Local Address</h4>
-                  </div>
-                  <p id="ipv6-link_local_address" class="tab-elem-value">unknown</p>
-                  <div class="d-flex align-items-center mt-4">
-                    <h4>Routing Local Address</h4>
-                  </div>
-                  <p id="ipv6-routing_local_address" class="tab-elem-value">unknown</p>
-                  <div class="d-flex align-items-center mt-4">
-                    <h4>Mesh Local Address</h4>
-                  </div>
-                  <p id="ipv6-mesh_local_address" class="tab-elem-value">unknown</p>
-                  <div class="d-flex align-items-center mt-4">
-                    <h4>Mesh Local Prefix</h4>
-                  </div>
-                  <p id="ipv6-mesh_local_prefix" class="tab-elem-value">unknown</p>
-                </div>
-                <div class="col-lg-3">
-                  <h4 class="tab-pane-elem" style="font-weight: bold; font-style:normal; color: black"> [ Network Information ]</h4>
-                  <div class="d-flex align-items-center mt-4">
-                    <h4>Name</h4>
-                  </div>
-                  <p id="network-name" class="tab-elem-value">unknown</p>
-                  <div class="d-flex align-items-center mt-4">
-                    <h4>PANID</h4>
-                  </div>
-                  <p id="network-panid" class="tab-elem-value">unknown</p>
-                  <div class="d-flex align-items-center mt-4">
-                    <h4>Partition ID</h4>
-                  </div>
-                  <p id="network-partition_id" class="tab-elem-value">unknown</p>
-                  <div class="d-flex align-items-center mt-4">
-                    <h4>Extended PANID</h4>
-                  </div>
-                  <p id="network-xpanid" class="tab-elem-value">unknown</p>
-                  <div class="d-flex align-items-center mt-4">
-                    <h4>Border Agent ID</h4>
-                  </div>
-                  <p id="network-baid" class="tab-elem-value">unknown</p>
-                </div>
-                <div class="col-lg-3">
-                  <h4 class="tab-pane-elem" style="font-weight: bold; font-style:normal; color: black"> [ OpenThread Parameter ]</h4>
-                  <div class="d-flex align-items-center mt-4">
-                    <h4>Version</h4>
-                  </div>
-                  <p id="openthread-version" class="tab-elem-value">unknown</p>
-                  <div class="d-flex align-items-center mt-4">
-                    <h4>Version API</h4>
-                  </div>
-                  <p id="openthread-version_api" class="tab-elem-value">unknown</p>
-                  <div class="d-flex align-items-center mt-4">
-                    <h4>Role</h4>
-                  </div>
-                  <p id="openthread-role" class="tab-elem-value">unknown</p>
-                  <div class="d-flex align-items-center mt-4">
-                    <h4>PSKc</h4>
-                  </div>
-                  <p id="openthread-PSKc" class="tab-elem-value">unknown</p>
-                </div>
-                <div class="col-lg-2">
-                  <h4 class="tab-pane-elem" style="font-weight: bold; font-style:normal; color: black"> [ RCP Information ]</h4>
-                  <div class="d-flex align-items-center mt-4">
-                    <h4>Channel</h4>
-                  </div>
-                  <p id="rcp-channel" class="tab-elem-value">unknown</p>
-                  <div class="d-flex align-items-center mt-4">
-                    <h4>IEEE EUI-64</h4>
-                  </div>
-                  <p id="rcp-EUI64" class="tab-elem-value">unknown</p>
-                  <div class="d-flex align-items-center mt-4">
-                    <h4>TxPower</h4>
-                  </div>
-                  <p id="rcp-txpower" class="tab-elem-value">unknown</p>
-                  <div class="d-flex align-items-center mt-4">
-                    <h4>Version</h4>
-                  </div>
-                  <p id="rcp-version" class="tab-elem-value">unknown</p>
-                </div>
-                <div class="col-lg-1">
-                  <h4 class="tab-pane-elem" style="font-weight: bold; font-style:normal; color: black"> [ WPAN Status ]</h4>
-                  <div class="d-flex align-items-center mt-4">
-                    <h4>Service</h4>
-                  </div>
-                  <p id="WPAN-service" class="tab-elem-value">unknown</p>
+                <div class="col-md-2">
+                  <div class="metric-value text-warning" id="total-errors">0</div>
+                  <div class="metric-label text-muted">Errors</div>
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
 
-            <div class="tab-pane" id="tab1">
-              <div class="row">
-                <div class="d-flex align-items-center mt-4">
-                  <h4>Link Local Address</h4>
-                </div>
-                <p id="t-ipv6-link_local_address" class="tab-elem-value">unknown</p>
-                <div class="d-flex align-items-center mt-4">
-                  <h4>Routing Local Address</h4>
-                </div>
-                <p id="t-ipv6-routing_local_address" class="tab-elem-value">unknown</p>
-                <div class="d-flex align-items-center mt-4">
-                  <h4>Mesh Local Address</h4>
-                </div>
-                <p id="t-ipv6-mesh_local_address" class="tab-elem-value">unknown</p>
-                <div class="d-flex align-items-center mt-4">
-                  <h4>Mesh Local Prefix</h4>
-                </div>
-                <p id="t-ipv6-mesh_local_prefix" class="tab-elem-value">unknown</p>
-              </div>
-            </div>
-            <div class="tab-pane" id="tab2">
-              <div class="row">
-                <div class="d-flex align-items-center mt-4">
-                  <h4>Name</h4>
-                </div>
-                <p id="t-network-name" class="tab-elem-value">unknown</p>
-                <div class="d-flex align-items-center mt-4">
-                  <h4>PANID</h4>
-                </div>
-                <p id="t-network-panid" class="tab-elem-value">unknown</p>
-                <div class="d-flex align-items-center mt-4">
-                  <h4>Partition ID</h4>
-                </div>
-                <p id="t-network-partition_id" class="tab-elem-value">unknown</p>
-                <div class="d-flex align-items-center mt-4">
-                  <h4>XPANID</h4>
-                </div>
-                <p id="t-network-xpanid" class="tab-elem-value">unknown</p>
-                <div class="d-flex align-items-center mt-4">
-                  <h4>Border Agent ID</h4>
-                </div>
-                <p id="t-network-baid" class="tab-elem-value">unknown</p>
-              </div>
-            </div>
-            <div class="tab-pane" id="tab3">
-              <div class="row">
-                <div class="d-flex align-items-center mt-4">
-                  <h4>Version</h4>
-                </div>
-                <p id="t-openthread-version" class="tab-elem-value">unknown</p>
-                <div class="d-flex align-items-center mt-4">
-                  <h4>Version API</h4>
-                </div>
-                <p id="t-openthread-version_api" class="tab-elem-value">unknown</p>
-                <div class="d-flex align-items-center mt-4">
-                  <h4>Role</h4>
-                </div>
-                <p id="t-openthread-role" class="tab-elem-value">unknown</p>
-                <div class="d-flex align-items-center mt-4">
-                  <h4>PSKc</h4>
-                </div>PSKc
-                <p id="t-openthread-PSKc" class="tab-elem-value">unknown</p>
-              </div>
-            </div>
-            <div class="tab-pane" id="tab4">
-              <div class="row">
-                <div class="d-flex align-items-center mt-4">
-                  <h4>Channel</h4>
-                </div>
-                <p id="t-rcp-channel" class="tab-elem-value">unknown</p>
-                <div class="d-flex align-items-center mt-4">
-                  <h4>EUI64</h4>
-                </div>
-                <p id="t-rcp-EUI64" class="tab-elem-value">unknown</p>
-                <div class="d-flex align-items-center mt-4">
-                  <h4>Tx Power</h4>
-                </div>
-                <p id="t-rcp-txpower" class="tab-elem-value">unknown</p>
-                <div class="d-flex align-items-center mt-4">
-                  <h4>Version</h4>
-                </div>
-                <p id="t-rcp-version" class="tab-elem-value">unknown</p>
-              </div>
-            </div>
-            <div class="tab-pane" id="tab5">
-              <div class="row">
-                <div class="d-flex align-items-center mt-4">
-                  <h4>Service</h4>
-                </div>
-                <p id="t-WPAN-service" class="tab-elem-value">unknown</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-    <section id="Topology" class="sub-section">
-      <div class="container">
-        <div class="section-header default-margin">
-          <h2>Thread Network <span style="color: #0ea2bd">Topology</span></h2>
-          <p>The network topology structure of Thread will be shown in a more intuitive and detailed manner here.</p>
-        </div>
-        <div class="part">
-          <hr />
-          <div class="row">
-            <div class="col-md-3 col-md-offset-1">
-              <h4 style="font-weight:800">Network Name: &nbsp;<span id="topology_netwotkname" style="color: gray;">
-                  unknown</span></h4>
-            </div>
-            <div class="col-md-2">
-              <h4 style="font-weight:800">Leader: &nbsp;<span id="topology_leader" style="color: gray;"> unknown</span>
-              </h4>
-            </div>
-            <div class="col-md-3">
-              <h4 style="font-weight:800">Router Number: &nbsp;<span id="topology_router_number" style="color: gray;">
-                  unknown</span>
-              </h4>
-            </div>
-            <div class="col-md-3">
-              <button id="btn_topology" type="submit" value="Running" style="font-weight: bold;"
-                onclick="http_server_build_thread_network_topology(this)">Start Topology</button>
-            </div>
-          </div>
-          <hr />
-          <!-- <div class="topology-graph"> -->
-          <div class="d3graph" id="tolology_canvas"></div>
-          <!-- </div> -->
-        </div>
-      </div>
-    </section>
-    <section id="Contact" class="contact">
-      <div class="container">
-        <div class="section-header default-margin">
-          <h2>Contact <span style="color: #0ea2bd">Us</span></h2>
-          <p>If you meet some questions or have a few advises for us, there is a way to contact us.</p>
-        </div>
+      <!-- IPv6 Addresses -->
+      <div class="detail-section">
+        <h4 class="section-title">
+          <i class="fas fa-network-wired me-2"></i>IPv6 Addresses
+        </h4>
         <div class="row">
-          <div class="col-md-11">
-            <div class="info">
-              <h3>Get in Touch</h3>
-              <p>The following is a list of contact information that may be helpful to you, including Sales Questions, Technical Inquiries, 
-                  Get-Samples, and Comments & Suggestions.</p>
-              <div class="info-item">
-                <div>
-                  <h4>Technical Inquiries:</h4>
-                  <a href="https://www.espressif.com/en/contact-us/technical-inquiries">
-                    Do you have any technical questions about our products?</a>
+          <div class="col-md-6">
+            <strong>Link Local:</strong><br>
+            <code id="ipv6-link-local" class="text-muted">Loading...</code>
+          </div>
+          <div class="col-md-6">
+            <strong>Mesh Local:</strong><br>
+            <code id="ipv6-mesh-local" class="text-muted">Loading...</code>
+          </div>
+        </div>
+        <div class="row mt-2">
+          <div class="col-md-6">
+            <strong>Routing Local:</strong><br>
+            <code id="ipv6-routing-local" class="text-muted">Loading...</code>
+          </div>
+          <div class="col-md-6">
+            <strong>Mesh Local Prefix:</strong><br>
+            <code id="ipv6-mesh-prefix" class="text-muted">Loading...</code>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Topology Section -->
+    <section id="topology">
+      <div class="row mb-4">
+        <div class="col-12">
+          <h2 class="section-title">
+            <i class="fas fa-project-diagram me-2"></i>Network Topology
+            <button class="btn btn-primary btn-sm float-end refresh-button" onclick="refreshTopology()">
+              <i class="fas fa-sync-alt me-1" id="topology-refresh-icon"></i>Refresh Topology
+            </button>
+          </h2>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-lg-8">
+          <div class="card">
+            <div class="card-header">
+              <i class="fas fa-project-diagram me-2"></i>Network Diagram
+            </div>
+            <div class="card-body">
+              <div id="topology-canvas" class="topology-container">
+                <div class="d-flex justify-content-center align-items-center h-100">
+                  <div class="text-center">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="mt-2 text-muted">Loading topology...</p>
+                  </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="card">
+            <div class="card-header">
+              <i class="fas fa-info-circle me-2"></i>Topology Legend
+            </div>
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-2">
+                <div class="status-indicator status-leader"></div>
+                <span>Leader</span>
+              </div>
+              <div class="d-flex align-items-center mb-2">
+                <div class="status-indicator status-router"></div>
+                <span>Router</span>
+              </div>
+              <div class="d-flex align-items-center mb-2">
+                <div class="status-indicator status-child"></div>
+                <span>Child Device</span>
+              </div>
+              <div class="d-flex align-items-center mb-2">
+                <div class="status-indicator status-detached"></div>
+                <span>Selected Device</span>
+              </div>
+              <hr>
+              <h6>Quick Stats:</h6>
+              <p class="mb-1"><strong>Leader:</strong> <span id="topology-leader">Unknown</span></p>
+              <p class="mb-1"><strong>Routers:</strong> <span id="topology-router-count">0</span></p>
+              <p class="mb-0"><strong>Network:</strong> <span id="topology-network-name">Unknown</span></p>
+            </div>
+          </div>
+
+          <div class="card mt-3">
+            <div class="card-header">
+              <i class="fas fa-mouse-pointer me-2"></i>Device Details
+            </div>
+            <div class="card-body">
+              <div id="device-details">
+                <p class="text-muted text-center">Click on a device in the topology to view details</p>
               </div>
             </div>
           </div>
         </div>
       </div>
     </section>
-    <div id="log_window" class="dialog" style="padding-top: 10px;">
-      <div class="dialog-content" style="width: 400px; padding-top: 10px;">
-        <div id = "log_window_title"><span style="font-size: 30px;">Tip:</span></div>
-        <div style="width:100%; height:2px; border-top:1px solid #cecaca; clear:both;"></div>
-        <div class="row" style="text-align: center; padding-top: 20px; font-size: 18px;">
-          <p id = "log_window_content" style="display: inline-block;">Known</p>
-        </div>
-        <button type = "button" class="dialog-button" style ="width: 60px; height: 30px; " onclick="frontend_log_close(this)">Okay</button>
-      </div>
-    </div>
-  </main>
-  <footer id="footer" class="footer">
-    <div class="footer-content">
-      <div class="container">
-        <div class="row">
 
-          <div class="col-lg-3 col-md-6">
-            <div class="footer-info">
-              <h3>Espressif</h3>
-              <p>
-                Bibo Road, Pudong New Area, Shanghai <br>
-                NY 201203, China<br><br>
-                <strong>SHARE::CONNECT::INNOVATE</strong><br>
-              </p>
+    <!-- Devices Section -->
+    <section id="devices" class="mt-5">
+      <div class="row mb-4">
+        <div class="col-12">
+          <h2 class="section-title">
+            <i class="fas fa-list me-2"></i>Device Tables
+            <button class="btn btn-primary btn-sm float-end refresh-button" onclick="refreshDeviceTables()">
+              <i class="fas fa-sync-alt me-1" id="devices-refresh-icon"></i>Refresh Device Tables
+            </button>
+          </h2>
+        </div>
+      </div>
+
+      <!-- Router Table -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="fas fa-router me-2"></i>Router Table
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover data-table" id="router-table">
+              <thead>
+                <tr>
+                  <th>Router ID</th>
+                  <th>RLOC16</th>
+                  <th>MAC Address</th>
+                  <th>Link Quality In</th>
+                  <th>Link Quality Out</th>
+                  <th>Route Cost</th>
+                  <th>Role</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td colspan="7" class="text-center text-muted">Loading router information...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Child Table -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="fas fa-sitemap me-2"></i>Child Device Table
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover data-table" id="child-table">
+              <thead>
+                <tr>
+                  <th>Parent RLOC16</th>
+                  <th>Child ID</th>
+                  <th>Child RLOC16</th>
+                  <th>MAC Address</th>
+                  <th>Timeout (sec)</th>
+                  <th>Link Mode</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td colspan="7" class="text-center text-muted">Loading child device information...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Diagnostics Section -->
+    <section id="diagnostics" class="mt-5">
+      <div class="row mb-4">
+        <div class="col-12">
+          <h2 class="section-title">
+            <i class="fas fa-stethoscope me-2"></i>Network Diagnostics
+            <button class="btn btn-primary btn-sm float-end refresh-button" onclick="refreshDiagnostics()">
+              <i class="fas fa-sync-alt me-1" id="diagnostics-refresh-icon"></i>Refresh Diagnostics
+            </button>
+          </h2>
+        </div>
+      </div>
+
+      <!-- System Information -->
+      <div class="row mb-4">
+        <div class="col-lg-6">
+          <div class="card">
+            <div class="card-header">
+              <i class="fas fa-microchip me-2"></i>System Information
+            </div>
+            <div class="card-body">
+              <div class="info-row">
+                <div class="d-flex justify-content-between">
+                  <span class="info-label">OpenThread Version:</span>
+                  <span class="info-value" id="openthread-version">Loading...</span>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="d-flex justify-content-between">
+                  <span class="info-label">API Version:</span>
+                  <span class="info-value" id="openthread-version-api">Loading...</span>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="d-flex justify-content-between">
+                  <span class="info-label">RCP Version:</span>
+                  <span class="info-value" id="rcp-version">Loading...</span>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="d-flex justify-content-between">
+                  <span class="info-label">Border Agent ID:</span>
+                  <span class="info-value" id="border-agent-id">Loading...</span>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="d-flex justify-content-between">
+                  <span class="info-label">TX Power:</span>
+                  <span class="info-value" id="tx-power">Loading...</span>
+                </div>
+              </div>
             </div>
           </div>
+        </div>
 
-          <div class="col-lg-2 col-md-6 footer-links">
-            <h4>Products</h4>
-            <ul>
-              <li><i></i> <a href="https://www.espressif.com/en/products/socs">SoCs</a></li>
-              <li><i></i> <a href="https://www.espressif.com/en/products/modules">Modules</a></li>
-              <li><i></i> <a href="https://www.espressif.com/en/products/devKits">DeKits</a></li>
-            </ul>
-          </div>
-
-          <div class="col-lg-3 col-md-6 footer-links">
-            <h4>Documents</h4>
-            <ul>
-              <li> <a href="https://www.espressif.com/en/support/documents/technical-documents">Technical Documents</a>
-              </li>
-              <li> <a href="https://www.espressif.com/en/support/documents/certificates">Certificates</a></li>
-              <li> <a href="https://www.espressif.com/en/support/documents/pcns">PCNs</a></li>
-              <li> <a href="https://www.espressif.com/en/support/documents/advisories">Advisories</a></li>
-            </ul>
-          </div>
-
-          <div class="col-lg-4 col-md-6 footer-newsletter">
-            <h4>Some Advice</h4>
-            <p>Join us to create an interconnection of all things world</p>
-            <form action="" method="post">
-              <a href="https://www.espressif.com/en/subscribe"><input type="email" name="email"><input type="button"
-                  value="Subscribe"></a>
-            </form>
+        <div class="col-lg-6">
+          <div class="card">
+            <div class="card-header">
+              <i class="fas fa-radio me-2"></i>Radio Information
+            </div>
+            <div class="card-body">
+              <div class="info-row">
+                <div class="d-flex justify-content-between">
+                  <span class="info-label">Channel:</span>
+                  <span class="info-value" id="radio-channel">Loading...</span>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="d-flex justify-content-between">
+                  <span class="info-label">RCP EUI64:</span>
+                  <span class="info-value mac-address" id="rcp-eui64">Loading...</span>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="d-flex justify-content-between">
+                  <span class="info-label">Extended PAN ID:</span>
+                  <span class="info-value mac-address" id="extended-panid">Loading...</span>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="d-flex justify-content-between">
+                  <span class="info-label">Partition ID:</span>
+                  <span class="info-value" id="partition-id">Loading...</span>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="d-flex justify-content-between">
+                  <span class="info-label">WPAN Service:</span>
+                  <span class="info-value" id="wpan-service">Loading...</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <div class="footer-legal text-center">
-      <div class="container flex-lg-row justify-content-center justify-content-lg-between align-items-center">
-        <div class="align-items-center align-items-lg-start">
-          <div class="copyright">
-            &copy; Copyright <strong><span>@2022 ESPRESSIF SYSTEMS (SHANGHAI) CO., LTD.</span></strong>. All Rights
-            Reserved
-          </div>
-          <div class="credits">
-            Designed by ESPRESSIF's 15.4 Group
+
+      <!-- Detailed MAC Counters -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <i class="fas fa-list-alt me-2"></i>MAC Layer Statistics
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-sm">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Device</th>
+                      <th>Unicast In</th>
+                      <th>Unicast Out</th>
+                      <th>Broadcast In</th>
+                      <th>Broadcast Out</th>
+                      <th>Errors In</th>
+                      <th>Errors Out</th>
+                      <th>Discards</th>
+                    </tr>
+                  </thead>
+                  <tbody id="mac-counters-table">
+                    <tr>
+                      <td colspan="8" class="text-center text-muted">Loading MAC statistics...</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </footer>
+    </section>
+
+    <!-- Network Configuration -->
+    <section id="network" class="mt-5">
+      <div class="row mb-4">
+        <div class="col-12">
+          <h2 class="section-title">
+            <i class="fas fa-cog me-2"></i>Network Management
+          </h2>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header">
+              <i class="fas fa-search me-2"></i>Scan Networks
+            </div>
+            <div class="card-body">
+              <button class="btn btn-primary w-100" onclick="scanNetworks()">
+                <i class="fas fa-search me-2"></i>Scan for Thread Networks
+              </button>
+              <div id="scan-results" class="mt-3"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header">
+              <i class="fas fa-plus me-2"></i>Form Network
+            </div>
+            <div class="card-body">
+              <button class="btn btn-success w-100" onclick="showFormNetwork()">
+                <i class="fas fa-plus me-2"></i>Create New Network
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Modals and Scripts -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="/static/restful.js"></script>
+
+  <script>
+    // Initialize the dashboard when page loads
+    document.addEventListener('DOMContentLoaded', function () {
+      console.log('Dashboard loading...');
+
+      // Wait for external scripts to load
+      setTimeout(function () {
+        initializeDashboard();
+      }, 500);
+    });
+
+    function initializeDashboard() {
+      console.log('Initializing dashboard...');
+
+      // Load all data immediately
+      refreshAllData();
+
+      // Initialize topology after a short delay to ensure D3 is loaded
+      setTimeout(() => {
+        refreshTopology();
+      }, 1000);
+    }
+
+    function showLoading() {
+      // Add loading class to main elements
+      document.querySelectorAll('.card').forEach(card => {
+        card.classList.add('loading');
+      });
+
+      // Spin refresh icons
+      document.querySelectorAll('[id$="-refresh-icon"]').forEach(icon => {
+        icon.classList.add('fa-spin');
+      });
+    }
+
+    function hideLoading() {
+      // Remove loading class
+      document.querySelectorAll('.card').forEach(card => {
+        card.classList.remove('loading');
+      });
+
+      // Stop spinning refresh icons
+      document.querySelectorAll('[id$="-refresh-icon"]').forEach(icon => {
+        icon.classList.remove('fa-spin');
+      });
+    }
+
+    function showSectionLoading(sectionId) {
+      const section = document.getElementById(sectionId);
+      if (section) {
+        section.classList.add('refreshing');
+        // Find all cards in this section
+        section.querySelectorAll('.card').forEach(card => {
+          card.classList.add('loading');
+        });
+      }
+    }
+
+    function hideSectionLoading(sectionId) {
+      const section = document.getElementById(sectionId);
+      if (section) {
+        section.classList.remove('refreshing');
+        // Remove loading from all cards in this section
+        section.querySelectorAll('.card').forEach(card => {
+          card.classList.remove('loading');
+        });
+      }
+    }
+
+    function refreshAllData() {
+      // Show global loading
+      showLoading();
+
+      // Update global refresh button
+      const globalButton = document.querySelector('button[onclick="refreshAllData()"]');
+      if (globalButton) {
+        globalButton.disabled = true;
+        const icon = globalButton.querySelector('i');
+        if (icon) icon.classList.add('fa-spin');
+      }
+
+      Promise.allSettled([
+        fetchNetworkProperties(),
+        fetchNodeInformation(),
+        fetchActiveDataset(),
+        fetchTopologyData()
+      ]).then(results => {
+        console.log('All data refreshed', results);
+      }).catch(error => {
+        console.error('Error refreshing data:', error);
+      }).finally(() => {
+        hideLoading();
+        if (globalButton) {
+          globalButton.disabled = false;
+          const icon = globalButton.querySelector('i');
+          if (icon) icon.classList.remove('fa-spin');
+        }
+      });
+    }
+
+    function fetchNetworkProperties() {
+      return fetch('/get_properties')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log('Network properties received:', data);
+          if (data.error === 0) {
+            updateNetworkInfo(data.result);
+          } else {
+            console.error('Network properties error:', data.message);
+          }
+          return data;
+        })
+        .catch(error => {
+          console.error('Failed to fetch network properties:', error);
+          throw error;
+        });
+    }
+
+    function fetchNodeInformation() {
+      return fetch('/node_information')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log('Node information received:', data);
+          if (data.error === 0) {
+            updateNodeInfo(data.result);
+          } else {
+            console.error('Node information error:', data.message);
+          }
+          return data;
+        })
+        .catch(error => {
+          console.error('Failed to fetch node information:', error);
+          throw error;
+        });
+    }
+
+    function fetchTopologyData() {
+      return fetch('/topology')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log('Topology data received:', data);
+          if (data.error === 0) {
+            updateTopologyData(data.result);
+          } else {
+            console.error('Topology data error:', data.message);
+          }
+          return data;
+        })
+        .catch(error => {
+          console.error('Failed to fetch topology data:', error);
+          throw error;
+        });
+    }
+
+    function fetchActiveDataset() {
+      return fetch('/node/dataset/active')
+        .then(response => {
+          if (!response.ok) {
+            if (response.status === 204) {
+              console.log('No active dataset available');
+              return { noDataset: true };
+            }
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log('Active dataset received:', data);
+          if (data && !data.noDataset) {
+            updateDatasetInfo(data);
+          }
+          return data;
+        })
+        .catch(error => {
+          console.error('Failed to fetch active dataset:', error);
+          return { error: true };
+        });
+    }
+
+    function updateNetworkInfo(properties) {
+      // Update network information
+      document.getElementById('network-name').textContent = properties['Network:Name'] || 'Unknown';
+      document.getElementById('network-panid').textContent = properties['Network:PANID'] || 'Unknown';
+      document.getElementById('network-channel').textContent = properties['RCP:Channel'] || 'Unknown';
+
+      // Update IPv6 addresses
+      document.getElementById('ipv6-link-local').textContent = properties['IPv6:LinkLocalAddress'] || 'Unknown';
+      document.getElementById('ipv6-mesh-local').textContent = properties['IPv6:MeshLocalAddress'] || 'Unknown';
+      document.getElementById('ipv6-routing-local').textContent = properties['IPv6:RoutingLocalAddress'] || 'Unknown';
+      document.getElementById('ipv6-mesh-prefix').textContent = properties['IPv6:MeshLocalPrefix'] || 'Unknown';
+
+      // Update device role and status
+      const role = properties['RCP:State'] || 'unknown';
+      document.getElementById('device-role').textContent = role;
+      document.getElementById('network-status').textContent = role;
+
+      // Update diagnostic information
+      updateDiagnosticInfo(properties);
+
+      // Update status indicator
+      const statusIndicator = document.getElementById('status-indicator');
+      if (role !== 'unknown' && role !== 'disabled' && role !== 'detached') {
+        statusIndicator.classList.remove('status-offline');
+        statusIndicator.classList.add('status-online');
+      } else {
+        statusIndicator.classList.remove('status-online');
+        statusIndicator.classList.add('status-offline');
+      }
+    }
+
+    function updateDiagnosticInfo(properties) {
+      // System Information
+      // Update network extended PAN ID and PSKc from properties
+      updateElementSafe('network-extpanid', formatMacAddress(properties['Network:XPANID']) || 'Unknown');
+      updateElementSafe('network-pskc', formatMacAddress(properties['OpenThread:PSKc']) || 'Unknown');
+
+      updateElementSafe('openthread-version', properties['OpenThread:Version'] || 'Unknown');
+      updateElementSafe('openthread-version-api', properties['OpenThread:VersionAPI'] || 'Unknown');
+      updateElementSafe('rcp-version', properties['RCP:Version'] || 'Unknown');
+      updateElementSafe('border-agent-id', properties['Network:BorderAgentID'] || 'Unknown');
+      updateElementSafe('tx-power', (properties['RCP:TxPower'] || 'Unknown') + (properties['RCP:TxPower'] !== 'Unknown' ? ' dBm' : ''));
+
+      // Radio Information  
+      updateElementSafe('radio-channel', properties['RCP:Channel'] || 'Unknown');
+      updateElementSafe('rcp-eui64', formatMacAddress(properties['RCP:EUI64']) || 'Unknown');
+      updateElementSafe('extended-panid', formatMacAddress(properties['Network:XPANID']) || 'Unknown');
+      updateElementSafe('partition-id', properties['Network:PartitionID'] || 'Unknown');
+      updateElementSafe('wpan-service', properties['WPAN service'] || 'Unknown');
+    }
+
+    function updateDatasetInfo(dataset) {
+      console.log('Updating dataset info:', dataset);
+
+      // Update network key from dataset TLVs
+      if (dataset.NetworkKey) {
+        updateElementSafe('network-key', dataset.NetworkKey);
+      } else if (dataset.MasterKey) {
+        updateElementSafe('network-key', dataset.MasterKey);
+      }
+
+      // Update channel mask from dataset
+      if (dataset.ChannelMask) {
+        if (typeof dataset.ChannelMask === 'number') {
+          updateElementSafe('network-channel-mask', `0x${dataset.ChannelMask.toString(16).toUpperCase()}`);
+        } else {
+          updateElementSafe('network-channel-mask', dataset.ChannelMask);
+        }
+      } else if (dataset.Channel) {
+        // If no channel mask, show single channel bit
+        const channelMask = 1 << dataset.Channel;
+        updateElementSafe('network-channel-mask', `0x${channelMask.toString(16).toUpperCase()}`);
+      }
+
+      // Update other TLV fields if available
+      if (dataset.NetworkName) {
+        updateElementSafe('network-name', dataset.NetworkName);
+      }
+
+      if (dataset.Channel) {
+        updateElementSafe('network-channel', dataset.Channel);
+      }
+
+      if (dataset.PanId) {
+        updateElementSafe('network-panid', `0x${dataset.PanId.toString(16).toUpperCase()}`);
+      }
+
+      if (dataset.ExtendedPanId) {
+        updateElementSafe('network-extpanid', formatMacAddress(dataset.ExtendedPanId));
+      }
+
+      if (dataset.PSKc) {
+        updateElementSafe('network-pskc', formatMacAddress(dataset.PSKc));
+      }
+    }
+
+    function updateElementSafe(id, value) {
+      const element = document.getElementById(id);
+      if (element) {
+        element.textContent = value;
+      }
+    }
+
+    function updateNodeInfo(nodeInfo) {
+      document.getElementById('device-rloc16').textContent = nodeInfo['Rloc16'] || 'Unknown';
+
+      // Handle Extended Address formatting
+      const extAddress = nodeInfo['ExtendedAddress'] || nodeInfo['ExtAddress'] || 'Unknown';
+      const formattedExtAddress = extAddress !== 'Unknown' ? formatMacAddress(extAddress) : 'Unknown';
+      document.getElementById('device-ext-address').textContent = formattedExtAddress;
+
+      document.getElementById('router-count').textContent = nodeInfo['RouterNumber'] || '0';
+    }
+
+    function updateTopologyData(topologyData) {
+      if (!topologyData || !Array.isArray(topologyData)) {
+        console.log('No topology data available');
+        return;
+      }
+
+      // Clear existing tables
+      clearTables();
+
+      let routerCount = 0;
+      let childCount = 0;
+
+      // Process each node in the topology
+      topologyData.forEach(node => {
+        if (node.ChildTable) {
+          // This is a router
+          addRouterToTable(node);
+          routerCount++;
+
+          // Add its children
+          node.ChildTable.forEach(child => {
+            addChildToTable(node, child);
+            childCount++;
+          });
+        }
+      });
+
+      // Update counts
+      document.getElementById('router-count').textContent = routerCount;
+      document.getElementById('child-count').textContent = childCount;
+      document.getElementById('total-devices').textContent = routerCount + childCount;
+      document.getElementById('topology-router-count').textContent = routerCount;
+
+      // Update diagnostic tables
+      updateMacCountersTable(topologyData);
+      updateNetworkMetrics(topologyData);
+
+      // Update topology visualization
+      drawTopology(topologyData);
+    }
+
+    function updateMacCountersTable(topologyData) {
+      const tbody = document.getElementById('mac-counters-table');
+      if (!tbody) return;
+
+      tbody.innerHTML = '';
+
+      topologyData.forEach(node => {
+        if (node.MACCounters) {
+          const row = tbody.insertRow();
+          const deviceName = node.ExtAddress ? formatMacAddress(node.ExtAddress) : (node.Rloc16 || 'Unknown');
+
+          row.innerHTML = `
+            <td><span class="mac-address">${deviceName}</span></td>
+            <td>${(node.MACCounters.IfInUcastPkts || 0).toLocaleString()}</td>
+            <td>${(node.MACCounters.IfOutUcastPkts || 0).toLocaleString()}</td>
+            <td>${(node.MACCounters.IfInBroadcastPkts || 0).toLocaleString()}</td>
+            <td>${(node.MACCounters.IfOutBroadcastPkts || 0).toLocaleString()}</td>
+            <td>${(node.MACCounters.IfInErrors || 0).toLocaleString()}</td>
+            <td>${(node.MACCounters.IfOutErrors || 0).toLocaleString()}</td>
+            <td>${(node.MACCounters.IfInDiscards + node.MACCounters.IfOutDiscards || 0).toLocaleString()}</td>
+          `;
+        }
+      });
+
+      if (tbody.children.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No MAC statistics available</td></tr>';
+      }
+    }
+
+    function updateNetworkMetrics(topologyData) {
+      let totalPacketsIn = 0;
+      let totalPacketsOut = 0;
+      let totalErrors = 0;
+
+      topologyData.forEach(node => {
+        if (node.MACCounters) {
+          totalPacketsIn += node.MACCounters.IfInUcastPkts || 0;
+          totalPacketsIn += node.MACCounters.IfInBroadcastPkts || 0;
+          totalPacketsOut += node.MACCounters.IfOutUcastPkts || 0;
+          totalPacketsOut += node.MACCounters.IfOutBroadcastPkts || 0;
+          totalErrors += node.MACCounters.IfInErrors || 0;
+          totalErrors += node.MACCounters.IfOutErrors || 0;
+        }
+      });
+
+      updateElementSafe('total-packets-in', totalPacketsIn.toLocaleString());
+      updateElementSafe('total-packets-out', totalPacketsOut.toLocaleString());
+      updateElementSafe('total-errors', totalErrors.toLocaleString());
+    }
+
+    function clearTables() {
+      document.getElementById('router-table').getElementsByTagName('tbody')[0].innerHTML = '';
+      document.getElementById('child-table').getElementsByTagName('tbody')[0].innerHTML = '';
+    }
+
+    function addRouterToTable(router) {
+      const tbody = document.getElementById('router-table').getElementsByTagName('tbody')[0];
+      const row = tbody.insertRow();
+
+      const routerId = router.Rloc16 ? (parseInt(router.Rloc16, 16) >> 10).toString(16).toUpperCase() : 'Unknown';
+      const role = router.LeaderData && router.RouteId === router.LeaderData.LeaderRouterId ? 'Leader' : 'Router';
+      const macAddress = router.ExtAddress || 'Unknown';
+      const formattedMac = macAddress !== 'Unknown' ? formatMacAddress(macAddress) : 'Unknown';
+
+      row.innerHTML = `
+        <td>0x${routerId}</td>
+        <td>${router.Rloc16 || 'Unknown'}</td>
+        <td><span class="mac-address">${formattedMac}</span></td>
+        <td><span class="badge bg-success">Active</span></td>
+        <td><span class="badge bg-success">Active</span></td>
+        <td>0</td>
+        <td><span class="badge ${role === 'Leader' ? 'bg-primary' : 'bg-info'}">${role}</span></td>
+      `;
+    }
+
+    function addChildToTable(parent, child) {
+      const tbody = document.getElementById('child-table').getElementsByTagName('tbody')[0];
+      const row = tbody.insertRow();
+
+      const childRloc16 = parent.Rloc16 ? '0x' + (parseInt(parent.Rloc16, 16) + child.ChildId).toString(16).toUpperCase() : 'Unknown';
+      // Generate child MAC address based on parent's ExtAddress and child ID
+      const childMac = parent.ExtAddress && parent.ExtAddress !== 'Unknown' ?
+        generateChildMacAddress(parent.ExtAddress, child.ChildId) : 'Unknown';
+
+      row.innerHTML = `
+        <td>${parent.Rloc16 || 'Unknown'}</td>
+        <td>${child.ChildId || 'Unknown'}</td>
+        <td>${childRloc16}</td>
+        <td><span class="mac-address">${childMac}</span></td>
+        <td>${child.Timeout || 'Unknown'}</td>
+        <td>${child.Mode ? JSON.stringify(child.Mode) : 'Unknown'}</td>
+        <td><span class="badge bg-success">Connected</span></td>
+      `;
+    }
+
+    function drawTopology(topologyData) {
+      // Clear loading spinner first
+      const canvas = document.getElementById('topology-canvas');
+      if (canvas) {
+        canvas.innerHTML = '';
+      }
+
+      // Call the existing topology control function which handles the D3.js rendering
+      if (typeof ctrl_thread_network_topology === 'function') {
+        ctrl_thread_network_topology("Running");
+      } else {
+        console.warn('Topology rendering function not available');
+        canvas.innerHTML = '<div class="text-center p-4"><p class="text-muted">Topology visualization not available</p></div>';
+      }
+    }
+
+    function formatMacAddress(macString) {
+      if (!macString || macString === 'Unknown' || macString.length < 16) {
+        return 'Unknown';
+      }
+      // Format as XX:XX:XX:XX:XX:XX:XX:XX
+      return macString.match(/.{1,2}/g).join(':').toUpperCase();
+    }
+
+    function generateChildMacAddress(parentMac, childId) {
+      if (!parentMac || parentMac === 'Unknown') {
+        return 'Unknown';
+      }
+      // Generate a child MAC by modifying the last byte based on child ID
+      let macBytes = parentMac.match(/.{1,2}/g);
+      if (macBytes && macBytes.length >= 8) {
+        // Modify the last byte to create a unique child MAC
+        let lastByte = parseInt(macBytes[7], 16);
+        lastByte = (lastByte + childId) % 256;
+        macBytes[7] = lastByte.toString(16).padStart(2, '0');
+        return macBytes.join(':').toUpperCase();
+      }
+      return 'Unknown';
+    }
+
+    function refreshTopology() {
+      showSectionLoading('topology');
+
+      const icon = document.getElementById('topology-refresh-icon');
+      const button = document.querySelector('button[onclick="refreshTopology()"]');
+
+      if (button) button.disabled = true;
+      if (icon) icon.classList.add('fa-spin');
+
+      // Use the existing topology building function which handles the API calls
+      if (typeof http_server_build_thread_network_topology === 'function') {
+        http_server_build_thread_network_topology();
+      } else if (typeof ctrl_thread_network_topology === 'function') {
+        ctrl_thread_network_topology("Running");
+      }
+
+      // Remove spinner and loading after a delay
+      setTimeout(() => {
+        hideSectionLoading('topology');
+        if (button) button.disabled = false;
+        if (icon) icon.classList.remove('fa-spin');
+      }, 2000);
+    }
+
+    function refreshDiagnostics() {
+      showSectionLoading('diagnostics');
+
+      const icon = document.getElementById('diagnostics-refresh-icon');
+      const button = document.querySelector('button[onclick="refreshDiagnostics()"]');
+
+      if (button) button.disabled = true;
+      if (icon) icon.classList.add('fa-spin');
+
+      Promise.allSettled([
+        fetchNetworkProperties(),
+        fetchTopologyData()
+      ]).finally(() => {
+        hideSectionLoading('diagnostics');
+        if (button) button.disabled = false;
+        if (icon) icon.classList.remove('fa-spin');
+      });
+    }
+
+    function refreshDeviceTables() {
+      showSectionLoading('devices');
+
+      const icon = document.getElementById('devices-refresh-icon');
+      const button = document.querySelector('button[onclick="refreshDeviceTables()"]');
+
+      if (button) button.disabled = true;
+      if (icon) icon.classList.add('fa-spin');
+
+      // Refresh topology data which includes device tables
+      Promise.allSettled([
+        fetchTopologyData()
+      ]).finally(() => {
+        hideSectionLoading('devices');
+        if (button) button.disabled = false;
+        if (icon) icon.classList.remove('fa-spin');
+      });
+    }
+
+    function refreshNetworkOverview() {
+      showSectionLoading('overview');
+
+      const icon = document.getElementById('overview-refresh-icon');
+      const button = document.querySelector('button[onclick="refreshNetworkOverview()"]');
+
+      if (button) button.disabled = true;
+      if (icon) icon.classList.add('fa-spin');
+
+      // Only refresh network overview data
+      Promise.allSettled([
+        fetchNetworkProperties(),
+        fetchNodeInformation(),
+        fetchActiveDataset()
+      ]).then(results => {
+        console.log('Network overview data refreshed', results);
+      }).catch(error => {
+        console.error('Error refreshing network overview:', error);
+      }).finally(() => {
+        hideSectionLoading('overview');
+        if (button) button.disabled = false;
+        if (icon) icon.classList.remove('fa-spin');
+      });
+    }
+
+    function scanNetworks() {
+      // Placeholder for network scanning functionality
+      console.log('Scanning for networks...');
+    }
+
+    function showFormNetwork() {
+      // Placeholder for form network functionality
+      console.log('Showing form network dialog...');
+    }
+  </script>
 </body>
 
 </html>
-
